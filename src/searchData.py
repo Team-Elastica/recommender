@@ -1,8 +1,13 @@
 from elasticsearch import Elasticsearch
+import os
+from dotenv import load_dotenv, dotenv_values 
+
+load_dotenv() 
+
 
 client = Elasticsearch(
   "https://localhost:9200",
-   api_key=""
+   api_key=os.getenv('API')
 )
 
 def searchData(name: str, index:str):
@@ -21,6 +26,4 @@ def searchData(name: str, index:str):
 
 
 
-res = searchData('Rush Hour', 'movie')
-
-print(res)
+# res = searchData('Rush Hour', 'movie')
