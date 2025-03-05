@@ -1,3 +1,4 @@
 .env
-
+error.txt
+error2.txt
 *.csv
