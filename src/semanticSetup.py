@@ -17,9 +17,12 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 # df = pd.read_csv("data/csv/backlogged_games.csv")
 
 # title, genres, overview for Movie
-df = pd.read_csv("data/csv/TMDB_movie_dataset_v11.csv")
+# df = pd.read_csv("data/csv/TMDB_movie_dataset_v11.csv")
 
-for start in range(210000, len(df), 5000):
+# name, genres, overview for TV
+df = pd.read_csv("data/csv/TMDB_tv_dataset_v3.csv")
+
+for start in range(0, len(df), 5000):
     chunk = df.iloc[start:start + 5000]
 
     print(f"At {start} / {len(df)}")
@@ -44,21 +47,64 @@ for start in range(210000, len(df), 5000):
     '''
 
     # Movie
-    bulk_data = ""
-    for i, row in chunk.iterrows():
+    # bulk_data = ""
+    # for i, row in chunk.iterrows():
 
+    #     try:
+    #         array = model.encode(row["overview"]).tolist()
+    #     except TypeError:
+    #         array = model.encode("").tolist()
+
+    #     bulk_data += json.dumps({"index": {"_index": "semantic_movie", "_id": str(i)}}) + "\n"
+    #     bulk_data += json.dumps({
+    #         "Title": "NONERROR_Title" if pd.isna(row["title"]) else row["title"],
+    #         "Genres": "NONERROR_Genres" if pd.isna(row["genres"]) else row["genres"],
+    #         "Summary": "NONERROR_Summary" if pd.isna(row["overview"]) else row["overview"],
+    #         "embedding": array
+    #     }) + "\n"
+
+    # TV Show
+    # bulk_data = ""
+    # for i, row in chunk.iterrows():
+
+    #     try:
+    #         array = model.encode(row["overview"]).tolist()
+    #     except TypeError:
+    #         array = model.encode("").tolist()
+
+    #     bulk_data += json.dumps({"index": {"_index": "semantic_tv", "_id": str(i)}}) + "\n"
+    #     bulk_data += json.dumps({
+    #         "Title": "NONERROR_Title" if pd.isna(row["name"]) else row["name"],
+    #         "Genres": "NONERROR_Genres" if pd.isna(row["genres"]) else row["genres"],
+    #         "Summary": "NONERROR_Summary" if pd.isna(row["overview"]) else row["overview"],
+    #         "embedding": array
+    #     }) + "\n"
+
+    # TV Show
+    # Use a list to collect strings instead of concatenation
+    bulk_data_list = []
+
+    for i, row in chunk.iterrows():
+        # Handle encoding first
         try:
             array = model.encode(row["overview"]).tolist()
         except TypeError:
             array = model.encode("").tolist()
-
-        bulk_data += json.dumps({"index": {"_index": "semantic_movie", "_id": str(i)}}) + "\n"
-        bulk_data += json.dumps({
-            "Title": "NONERROR_Title" if pd.isna(row["title"]) else row["title"],
-            "Genres": "NONERROR_Genres" if pd.isna(row["genres"]) else row["genres"],
-            "Summary": "NONERROR_Summary" if pd.isna(row["overview"]) else row["overview"],
+        
+        # Prepare document with default values for missing data
+        doc = {
+            "Title": row.get("name", "NONERROR_Title"),
+            "Genres": row.get("genres", "NONERROR_Genres"),
+            "Summary": row.get("overview", "NONERROR_Summary"),
             "embedding": array
-        }) + "\n"
+        }
+    
+        # Add action and document to list
+        bulk_data_list.append(json.dumps({"index": {"_index": "semantic_tv", "_id": str(i)}}))
+        bulk_data_list.append(json.dumps(doc))
+
+        # Join all strings at once with newlines
+        bulk_data = "\n".join(bulk_data_list) + "\n"
 
 
     client.bulk(operations=bulk_data, pipeline="ent-search-generic-ingestion")
