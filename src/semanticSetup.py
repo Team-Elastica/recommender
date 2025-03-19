@@ -93,11 +93,12 @@ for start in range(0, len(df), 5000):
         
         # Prepare document with default values for missing data
         doc = {
-            "Title": row.get("name", "NONERROR_Title"),
-            "Genres": row.get("genres", "NONERROR_Genres"),
-            "Summary": row.get("overview", "NONERROR_Summary"),
+            "Title": "NONERROR_Title" if pd.isna(row["name"]) else row["name"],
+            "Genres": "NONERROR_Genres" if pd.isna(row["genres"]) else row["genres"],
+            "Summary": "NONERROR_Summary" if pd.isna(row["overview"]) else row["overview"],
             "embedding": array
         }
+
     
         # Add action and document to list
         bulk_data_list.append(json.dumps({"index": {"_index": "semantic_tv", "_id": str(i)}}))
@@ -106,8 +107,13 @@ for start in range(0, len(df), 5000):
         # Join all strings at once with newlines
         bulk_data = "\n".join(bulk_data_list) + "\n"
 
-
-    client.bulk(operations=bulk_data, pipeline="ent-search-generic-ingestion")
+    try:
+        client.bulk(operations=bulk_data, pipeline="ent-search-generic-ingestion")
+    except:
+        file = open("error.txt", 'w')
+        file.write(bulk_data)
+        file.close()
+    
 
 print("Finish\n")
 
