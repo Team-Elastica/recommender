@@ -6,7 +6,7 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 
 client = Elasticsearch(
   "https://localhost:9200",
-  api_key=os.getenv("API")
+   api_key= "API KEY HERE"
 )
 
 inputQuery = "Death Stranding 2"
