@@ -8,13 +8,13 @@ print("Starting...\n")
 
 client = Elasticsearch(
   "https://localhost:9200",
-   api_key= "API KEY HERE"
+   api_key="elhUTjhaUUJiM0VoczFmMGl6bmM6b1lLbjljeGNRTEMyc0RRN1A4RmtPdw=="
 )
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # name, genres, overview for TV
-df = pd.read_csv("data/csv/TMDB_tv_dataset_v3.csv")
+df = pd.read_csv("data/TMDB_tv_dataset_v3.csv")
 
 for start in range(0, len(df), 5000):
     chunk = df.iloc[start:start + 5000]
@@ -35,6 +35,7 @@ for start in range(0, len(df), 5000):
             "Summary": "EMPTY_SUMMARY" if pd.isna(row["overview"]) else row["overview"],
             "Release Date": "EMPTY_RELEASE_DATE" if pd.isna(row["first_air_date"]) else row["first_air_date"],
             "URL": "EMPTY_URL" if pd.isna(row["backdrop_path"]) else row["backdrop_path"],
+            "Adult": False if pd.isna(row["adult"]) else row["adult"],
             "embedding": array
         }
 

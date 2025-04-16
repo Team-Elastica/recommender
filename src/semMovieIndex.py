@@ -7,18 +7,18 @@ import os
 print("Starting...\n")
 
 client = Elasticsearch(
-  "https://localhost:9200",
-   api_key= "API KEY HERE"
+   "https://localhost:9200",
+   api_key= "elhUTjhaUUJiM0VoczFmMGl6bmM6b1lLbjljeGNRTEMyc0RRN1A4RmtPdw=="
 )
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # title, genres, overview for Movie
-df = pd.read_csv("data/csv/TMDB_movie_dataset_v11.csv")
+df = pd.read_csv("data/TMDB_movie_dataset_v11.csv")
 
 
-for start in range(0, len(df), 5000):
-    chunk = df.iloc[start:start + 5000]
+for start in range(0, len(df), 100):
+    chunk = df.iloc[start:start + 100]
 
     print(f"At {start} / {len(df)} : {(start/len(df)):.2%}")
 
@@ -36,6 +36,7 @@ for start in range(0, len(df), 5000):
             "Summary": "EMPTY_SUMMARY" if pd.isna(row["overview"]) else row["overview"],
             "Release Date": "EMPTY_RELEASE_DATE" if pd.isna(row["release_date"]) else row["release_date"],
             "URL": "EMPTY_URL" if pd.isna(row["poster_path"]) else row['poster_path'],
+            "Adult": False if pd.isna(row["adult"]) else row["adult"],
             "embedding": array
         }
 

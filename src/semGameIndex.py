@@ -8,13 +8,13 @@ print("Starting...\n")
 
 client = Elasticsearch(
   "https://localhost:9200",
-   api_key= "API KEY HERE"
+   api_key= "MayXZpjvRYyV1KyyQURrpw"
 )
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # Title, Genre, Summary for Game
-df = pd.read_csv("data/csv/backlogged_games.csv")
+df = pd.read_csv("data/backlogged_games.csv") # Change this to your data location!!!
 
 
 for start in range(0, len(df), 5000):
